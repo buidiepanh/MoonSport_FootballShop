@@ -153,7 +153,7 @@ const deleteUser = async (req, res, next) => {
 //=================Cart CRUD============================
 const viewAllCart = async (req, res, next) => {
   try {
-    const result = await Carts.find({})
+    const result = await Carts.find({ user: req.user._id })
       .populate("product")
       .populate("user", "_id username");
 
