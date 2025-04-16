@@ -163,16 +163,25 @@ function Cart() {
         loading={loading}
         pagination={false}
       />
-      <div style={{ textAlign: "right", marginTop: 20 }}>
-        <Title level={4}>Total: {totalPrice.toLocaleString("vi-VN")} VND</Title>
-        <Button
-          type="primary"
-          size="large"
-          onClick={() => handlePurchase(totalPrice)}
-        >
-          Proceed to Checkout
-        </Button>
-      </div>
+      {cartItems.length > 0 ? (
+        <>
+          {" "}
+          <div style={{ textAlign: "right", marginTop: 20 }}>
+            <Title level={4}>
+              Total: {totalPrice.toLocaleString("vi-VN")} VND
+            </Title>
+            <Button
+              type="primary"
+              size="large"
+              onClick={() => handlePurchase(totalPrice)}
+            >
+              Proceed to Checkout
+            </Button>
+          </div>
+        </>
+      ) : (
+        <></>
+      )}
     </div>
   );
 }
