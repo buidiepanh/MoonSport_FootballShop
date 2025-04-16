@@ -1,6 +1,9 @@
 // PaymentResult.jsx
 import React, { useEffect, useState } from "react";
-import { paymentCallback } from "../../../services/apiServices";
+import {
+  deleteAllCartItem,
+  paymentCallback,
+} from "../../../services/apiServices";
 import toast from "react-hot-toast";
 import { Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
@@ -8,6 +11,14 @@ import { useNavigate } from "react-router";
 
 const PaymentResult = () => {
   const navigation = useNavigate();
+
+  const handleDeleteAllCartItem = async () => {
+    try {
+      const result = await deleteAllCartItem();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   useEffect(() => {
     const fetchPaymentResult = async () => {
@@ -17,6 +28,7 @@ const PaymentResult = () => {
 
         if (res.status === 200) {
           toast.success("Payment success!");
+          handleDeleteAllCartItem();
           navigation("/");
         } else {
           toast.error("Payment failed!");

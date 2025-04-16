@@ -10,10 +10,15 @@ const {
   viewAllCart,
   deleteCartItem,
   updateCartItem,
+  deleteAllCartItem,
 } = require("../services/CRUDServices");
 
 cartRouter.use("*", authenticate);
-cartRouter.route("/").get(viewAllCart).post(addNewCart);
+cartRouter
+  .route("/")
+  .get(viewAllCart)
+  .post(addNewCart)
+  .delete(deleteAllCartItem);
 cartRouter.route("/:cartId").put(updateCartItem).delete(deleteCartItem);
 
 module.exports = cartRouter;

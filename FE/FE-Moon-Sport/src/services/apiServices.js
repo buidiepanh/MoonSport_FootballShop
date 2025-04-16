@@ -87,6 +87,15 @@ export const deleteCartItem = async (cartId) => {
   }
 };
 
+export const deleteAllCartItem = async () => {
+  try {
+    const result = await axios.delete("/carts");
+    return result.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const paymentItem = async (money) => {
   try {
     const result = await axios.post("/orders/create-payment", {
