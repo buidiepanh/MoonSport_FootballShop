@@ -11,6 +11,7 @@ import {
 import {
   deleteCartItem,
   getAllCartItem,
+  paymentItem,
   updateCartItem,
 } from "../../../services/apiServices";
 import toast from "react-hot-toast";
@@ -58,6 +59,15 @@ function Cart() {
         toast.success("Update product quantity success!");
         setCartItems(cartItems);
       }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handlePurchase = async (price) => {
+    try {
+      const result = await paymentItem(price);
+      window.location.href = result.url;
     } catch (error) {
       console.log(error);
     }
@@ -132,7 +142,11 @@ function Cart() {
       />
       <div style={{ textAlign: "right", marginTop: 20 }}>
         <Title level={4}>Total: {totalPrice.toLocaleString("vi-VN")} VND</Title>
-        <Button type="primary" size="large">
+        <Button
+          type="primary"
+          size="large"
+          onClick={() => handlePurchase(totalPrice)}
+        >
           Proceed to Checkout
         </Button>
       </div>
@@ -141,5 +155,3 @@ function Cart() {
 }
 
 export default Cart;
-
-//test github
