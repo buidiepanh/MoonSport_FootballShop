@@ -87,9 +87,30 @@ function Cart() {
     },
     {
       title: "Price",
-      dataIndex: ["product", "price"],
       key: "price",
-      render: (price) => `${price.toLocaleString("vi-VN")} VND`,
+      render: (_, record) => {
+        const { price, sale } = record.product;
+        const finalPrice = sale > 0 ? price - (price * sale) / 100 : price;
+
+        return sale > 0 ? (
+          <>
+            <span
+              style={{
+                textDecoration: "line-through",
+                color: "gray",
+                marginRight: 8,
+              }}
+            >
+              {price.toLocaleString("vi-VN")} VND
+            </span>
+            <span style={{ color: "red" }}>
+              {finalPrice.toLocaleString("vi-VN")} VND
+            </span>
+          </>
+        ) : (
+          <span>{price.toLocaleString("vi-VN")} VND</span>
+        );
+      },
     },
     {
       title: "Quantity",
@@ -107,9 +128,11 @@ function Cart() {
       title: "Total",
       key: "total",
       render: (_, record) =>
-        `${(record.quantity * record.product.price).toLocaleString(
-          "vi-VN"
-        )} VND`,
+        `${(
+          record.quantity *
+          (record.product.price -
+            (record.product.price * record.product?.sale) / 100)
+        ).toLocaleString("vi-VN")} VND`,
     },
     {
       title: "Action",
@@ -125,10 +148,11 @@ function Cart() {
     },
   ];
 
-  const totalPrice = cartItems.reduce(
-    (acc, item) => acc + item.product.price * item.quantity,
-    0
-  );
+  const totalPrice = cartItems.reduce((acc, item) => {
+    const { price, sale } = item.product;
+    const finalPrice = sale > 0 ? price - (price * sale) / 100 : price;
+    return acc + finalPrice * item.quantity;
+  }, 0);
 
   return (
     <div style={{ padding: 24 }}>
