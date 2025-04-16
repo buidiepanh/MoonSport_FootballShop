@@ -234,6 +234,23 @@ const deleteCartItem = async (req, res, next) => {
   }
 };
 
+const deleteAllCartItem = async (req, res, next) => {
+  try {
+    const userId = req.user._id;
+    const response = await Carts.deleteMany({ user: userId });
+
+    if (!response) {
+      res.status(400).json("Cannot delete items!");
+      return null;
+    }
+
+    res.status(200).json("Delete all item success!");
+    return response;
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAllCategory,
   postNewCategory,
@@ -251,4 +268,5 @@ module.exports = {
   addNewCart,
   updateCartItem,
   deleteCartItem,
+  deleteAllCartItem,
 };
