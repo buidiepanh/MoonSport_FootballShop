@@ -6,7 +6,6 @@ import {
   Image,
   Typography,
   Popconfirm,
-  message,
 } from "antd";
 import {
   deleteCartItem,
