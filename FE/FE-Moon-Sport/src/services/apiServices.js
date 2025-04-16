@@ -98,6 +98,15 @@ export const paymentItem = async (money) => {
   }
 };
 
+export const paymentCallback = async (url) => {
+  try {
+    const result = await axios.get(`/orders/vnpay-return${url}`);
+    return result;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 //=============Admin API=================
 
 export const getAllUsers = async () => {

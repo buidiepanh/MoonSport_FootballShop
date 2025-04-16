@@ -8,6 +8,7 @@ import Login from "../pages/authen/login/login";
 import Admin from "../pages/admin/admin";
 import Register from "../pages/authen/register/register";
 import Cart from "../pages/user/shopping-cart/cart";
+import PaymentResult from "../pages/user/payment/paymentCallback";
 
 function UserRouter() {
   return (
@@ -20,6 +21,7 @@ function UserRouter() {
         <Route path="/products/:productId" element={<Details />} />
         <Route path="/category/:categoryName" element={<Category />} />
         <Route path="/carts" element={<Cart />} />
+        <Route path="/orders/vnpay-return" element={<PaymentResult />} />
       </Routes>
       <MoonSportFooter />
     </>
