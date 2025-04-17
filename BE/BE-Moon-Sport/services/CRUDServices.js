@@ -84,6 +84,40 @@ const postNewProduct = async (req, res, next) => {
   }
 };
 
+const updateProduct = async (req, res, next) => {
+  try {
+    const result = await Products.findByIdAndUpdate(
+      req.params.productId,
+      { $set: req.body },
+      { new: true }
+    );
+
+    if (!result) {
+      res.status(400).json("Cannot update product!");
+      return null;
+    }
+
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteProduct = async (req, res, next) => {
+  try {
+    const response = await Products.findByIdAndDelete(req.params.productId);
+
+    if (!response) {
+      res.status(400).json("Cannot delete product!");
+      return null;
+    }
+
+    res.status(200).json("Delete product success!");
+  } catch (error) {
+    next(error);
+  }
+};
+
 //====================User CRUD======================
 const getAllUsers = async (req, res, next) => {
   try {
@@ -258,6 +292,8 @@ module.exports = {
 
   getAllProducts,
   postNewProduct,
+  updateProduct,
+  deleteProduct,
 
   getAllUsers,
   getAuthenitcatedUser,

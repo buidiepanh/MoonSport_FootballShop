@@ -147,3 +147,21 @@ export const deleteUser = async (userId) => {
     console.log(error);
   }
 };
+
+export const updateProduct = async (productId, newData) => {
+  try {
+    const result = await axios.put(`/products/${productId}`, newData);
+    return result.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const deleteProduct = async (productId) => {
+  try {
+    const result = await axios.delete(`/products/${productId}`);
+    return result.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
