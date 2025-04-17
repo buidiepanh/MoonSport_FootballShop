@@ -72,12 +72,16 @@ const getAllProducts = async (req, res, next) => {
 const postNewProduct = async (req, res, next) => {
   try {
     const result = await Products.create(req.body);
+    const categoryId = req.body.category;
 
     if (!result) {
       res.status(400).json("Cannot add product!");
       return null;
     }
 
+    await Categories.findByIdAndUpdate(categoryId, {
+      $push: { products: result._id },
+    });
     res.status(200).json(result);
   } catch (error) {
     console.log(error);
