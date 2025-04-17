@@ -19,6 +19,7 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import {
+  addNewProducts,
   deleteProduct,
   deleteUser,
   getAllCategories,
@@ -146,9 +147,28 @@ function Admin() {
             )
           );
         }
-        toast.success(`${isUserMode ? "User" : "Product"} updated`);
+
+        if (!updateData) {
+          toast.error(`Cannot update ${isUserMode ? "user" : "product"}!`);
+        } else {
+          toast.success(`${isUserMode ? "User" : "Product"} updated`);
+        }
       } else {
-        message.success(`${isUserMode ? "User" : "Product"} added`);
+        const result = await addNewProducts({
+          name: values.name,
+          price: values.price,
+          image: values.image,
+          sale: values?.sale || 0,
+          category: values.category,
+          description: values.description,
+        });
+
+        if (!result) {
+          toast.error("Cannot add product!");
+        } else {
+          toast.success("Add new product success!");
+          fetchProducts();
+        }
       }
 
       setIsModalVisible(false);
@@ -328,14 +348,16 @@ function Admin() {
             {isUserMode ? "User Management" : "Product Management"}
           </h3>
 
-          <Button
-            type="primary"
-            onClick={() => showModal()}
-            style={{ marginBottom: 24 }}
-            size="large"
-          >
-            Add {isUserMode ? "User" : "Product"}
-          </Button>
+          {!isUserMode && (
+            <Button
+              type="primary"
+              onClick={() => showModal()}
+              style={{ marginBottom: 24 }}
+              size="large"
+            >
+              Add Product
+            </Button>
+          )}
 
           <Table
             dataSource={data}
