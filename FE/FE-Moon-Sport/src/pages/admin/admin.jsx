@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
   Layout,
   Menu,
@@ -10,6 +10,7 @@ import {
   Space,
   Popconfirm,
   message,
+  Select,
 } from "antd";
 import {
   UserOutlined,
@@ -18,23 +19,23 @@ import {
 } from "@ant-design/icons";
 import { useNavigate } from "react-router";
 import {
+  deleteProduct,
   deleteUser,
+  getAllCategories,
+  getAllProducts,
   getAllUsers,
+  updateProduct,
   updateUser,
 } from "../../services/apiServices";
 import toast from "react-hot-toast";
 
 const { Header, Content, Sider } = Layout;
 
-const initialProducts = [
-  { id: 1, name: "iPhone 15", price: "999" },
-  { id: 2, name: "MacBook Air", price: "1299" },
-];
-
 function Admin() {
   const [selectedMenu, setSelectedMenu] = useState("users");
   const [users, setUsers] = useState([]);
-  const [products, setProducts] = useState(initialProducts);
+  const [products, setProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [form] = Form.useForm();
@@ -46,37 +47,65 @@ function Admin() {
 
   const showModal = (item = null) => {
     setEditingItem(item);
+
     form.setFieldsValue(
-      item ||
-        (isUserMode
-          ? { name: "", email: "" }
+      item
+        ? isUserMode
+          ? { username: item.username, email: item.email }
           : {
-              name: "",
-              price: "",
-              image: "",
-              sale: "",
-              category: "",
-              description: "",
-            })
+              name: item.name,
+              price: item.price,
+              image: item.image,
+              sale: item.sale,
+              category: item.category?._id,
+              description: item.description,
+            }
+        : isUserMode
+        ? { username: "", email: "" }
+        : {
+            name: "",
+            price: "",
+            image: "",
+            sale: "",
+            category: "",
+            description: "",
+          }
     );
 
     setIsModalVisible(true);
   };
 
-  useEffect(() => {
+  const fetchUser = async () => {
     try {
-      const fetchUser = async () => {
-        try {
-          const result = await getAllUsers();
-          setUsers(result);
-        } catch (error) {
-          console.log(error);
-        }
-      };
-      fetchUser();
+      const result = await getAllUsers();
+      setUsers(result);
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const fetchProducts = async () => {
+    try {
+      const result = await getAllProducts();
+      setProducts(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const result = await getAllCategories();
+      setCategories(result);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUser();
+    fetchProducts();
+    fetchCategories();
   }, []);
 
   const handleCancel = () => {
@@ -86,19 +115,37 @@ function Admin() {
 
   const handleSave = async () => {
     try {
-      const values = await form.validateFields();
+      let values = await form.validateFields();
 
       if (editingItem) {
-        const updateData = await updateUser(
-          editingItem?._id,
-          values.username,
-          values.email
-        );
-        setUsers((prevUsers) =>
-          prevUsers.map((user) =>
-            user._id === editingItem._id ? updateData : user
-          )
-        );
+        let updateData;
+
+        if (isUserMode) {
+          updateData = await updateUser(
+            editingItem?._id,
+            values.username,
+            values.email
+          );
+          setUsers((prevUsers) =>
+            prevUsers.map((user) =>
+              user._id === editingItem._id ? updateData : user
+            )
+          );
+        } else {
+          updateData = await updateProduct(editingItem._id, {
+            name: values.name,
+            price: values.price,
+            image: values.image,
+            sale: values.sale,
+            category: values.category,
+            description: values.description,
+          });
+          setProducts((prevProduct) =>
+            prevProduct.map((product) =>
+              product._id === editingItem._id ? updateData : product
+            )
+          );
+        }
         toast.success(`${isUserMode ? "User" : "Product"} updated`);
       } else {
         message.success(`${isUserMode ? "User" : "Product"} added`);
@@ -113,12 +160,21 @@ function Admin() {
 
   const handleDelete = async (id) => {
     try {
-      const response = await deleteUser(id);
+      let response;
+      if (isUserMode) {
+        response = await deleteUser(id);
+      } else {
+        response = await deleteProduct(id);
+      }
+
       if (!response) {
-        toast.error("Cannot delete user!");
+        toast.error(`Cannot delete ${isUserMode ? "user" : "product"}!`);
       }
       toast.success(`${isUserMode ? "User" : "Product"} deleted!`);
       setUsers((prevUsers) => prevUsers.filter((user) => user._id !== id));
+      setProducts((prevProducts) =>
+        prevProducts.filter((product) => product._id !== id)
+      );
     } catch (error) {
       console.log(error);
     }
@@ -200,6 +256,7 @@ function Admin() {
           title: "Category",
           dataIndex: "category",
           key: "category",
+          render: (category) => category?.name || "N/A",
         },
         {
           title: "Description",
@@ -217,7 +274,7 @@ function Admin() {
               </Button>
               <Popconfirm
                 title="Delete this product?"
-                onConfirm={() => handleDelete(record.id)}
+                onConfirm={() => handleDelete(record._id)}
                 okText="Yes"
                 cancelText="No"
               >
@@ -342,16 +399,7 @@ function Admin() {
                     <Input size="large" />
                   </Form.Item>
 
-                  <Form.Item
-                    name="sale"
-                    label="Sale"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please enter sale information!",
-                      },
-                    ]}
-                  >
+                  <Form.Item name="sale" label="Sale">
                     <Input size="large" />
                   </Form.Item>
 
@@ -359,10 +407,25 @@ function Admin() {
                     name="category"
                     label="Category"
                     rules={[
-                      { required: true, message: "Please enter a category!" },
+                      { required: true, message: "Please select a category" },
                     ]}
                   >
-                    <Input size="large" />
+                    <Select
+                      placeholder="Select a category"
+                      showSearch
+                      optionFilterProp="children"
+                      filterOption={(input, option) =>
+                        option?.children
+                          ?.toLowerCase()
+                          .includes(input.toLowerCase())
+                      }
+                    >
+                      {categories?.map((cat) => (
+                        <Select.Option key={cat._id} value={cat._id}>
+                          {cat.name}
+                        </Select.Option>
+                      ))}
+                    </Select>
                   </Form.Item>
 
                   <Form.Item
