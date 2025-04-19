@@ -150,7 +150,9 @@ function HeaderComp() {
           <Menu.Item key="category">Category</Menu.Item>
         </Dropdown>
         <Menu.Item key="sale">Sale</Menu.Item>
-        <Menu.Item key="about">About Us</Menu.Item>
+        <Menu.Item key="about" onClick={() => navigation("about-us")}>
+          About Us
+        </Menu.Item>
         <Menu.Item key="contact">Contact</Menu.Item>
       </Menu>
 

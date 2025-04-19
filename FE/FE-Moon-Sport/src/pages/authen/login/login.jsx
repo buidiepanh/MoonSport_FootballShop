@@ -22,6 +22,7 @@ function Login() {
         sessionStorage.setItem("token", result.accessToken);
 
         const user = await getAuthenticatedUser();
+        sessionStorage.setItem("admin", user?.admin);
         if (user.admin) {
           navigate("/admin");
         } else {

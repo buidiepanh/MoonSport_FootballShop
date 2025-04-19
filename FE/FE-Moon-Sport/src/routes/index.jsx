@@ -1,4 +1,4 @@
-import { Route, Routes } from "react-router";
+import { Navigate, Route, Routes } from "react-router";
 import Home from "../pages/user/home/home";
 import Details from "../pages/user/details/detail";
 import Category from "../pages/user/category/category";
@@ -9,6 +9,25 @@ import Admin from "../pages/admin/admin";
 import Register from "../pages/authen/register/register";
 import Cart from "../pages/user/shopping-cart/cart";
 import PaymentResult from "../pages/user/payment/paymentCallback";
+import toast from "react-hot-toast";
+import About from "../pages/user/about-us/about";
+
+const AuthMiddleWare = ({ children }) => {
+  const token = sessionStorage.getItem("token");
+  const roleAdmin = sessionStorage.getItem("admin") === "true";
+
+  if (!token) {
+    toast.error("Please log in!");
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!roleAdmin) {
+    toast.error("Access denied!");
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
 
 function UserRouter() {
   return (
@@ -20,6 +39,7 @@ function UserRouter() {
         <Route path="/register" element={<Register />} />
         <Route path="/products/:productId" element={<Details />} />
         <Route path="/category/:categoryName" element={<Category />} />
+        <Route path="/about-us" element={<About />} />
         <Route path="/carts" element={<Cart />} />
         <Route path="/orders/vnpay-return" element={<PaymentResult />} />
       </Routes>
@@ -43,7 +63,14 @@ export function AppRouter() {
     <>
       <Routes>
         <Route path="/*" element={<UserRouter />} />
-        <Route path="/admin" element={<AdminRouter />} />
+        <Route
+          path="/admin"
+          element={
+            <AuthMiddleWare>
+              <AdminRouter />
+            </AuthMiddleWare>
+          }
+        />
       </Routes>
     </>
   );
