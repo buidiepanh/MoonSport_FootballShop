@@ -71,18 +71,22 @@ const getAllProducts = async (req, res, next) => {
 
 const postNewProduct = async (req, res, next) => {
   try {
-    const result = await Products.create(req.body);
-    const categoryId = req.body.category;
+    if (req.user.admin) {
+      const result = await Products.create(req.body);
+      const categoryId = req.body.category;
 
-    if (!result) {
-      res.status(400).json("Cannot add product!");
-      return null;
+      if (!result) {
+        res.status(400).json("Cannot add product!");
+        return null;
+      }
+
+      await Categories.findByIdAndUpdate(categoryId, {
+        $push: { products: result._id },
+      });
+      res.status(200).json(result);
+    } else {
+      return res.status(401).json("Don't have permisson to do this!");
     }
-
-    await Categories.findByIdAndUpdate(categoryId, {
-      $push: { products: result._id },
-    });
-    res.status(200).json(result);
   } catch (error) {
     console.log(error);
   }
@@ -90,18 +94,22 @@ const postNewProduct = async (req, res, next) => {
 
 const updateProduct = async (req, res, next) => {
   try {
-    const result = await Products.findByIdAndUpdate(
-      req.params.productId,
-      { $set: req.body },
-      { new: true }
-    );
+    if (req.user.admin) {
+      const result = await Products.findByIdAndUpdate(
+        req.params.productId,
+        { $set: req.body },
+        { new: true }
+      );
 
-    if (!result) {
-      res.status(400).json("Cannot update product!");
-      return null;
+      if (!result) {
+        res.status(400).json("Cannot update product!");
+        return null;
+      }
+
+      res.status(200).json(result);
+    } else {
+      return res.status(401).json("Don't have permisson to do this!");
     }
-
-    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -109,14 +117,18 @@ const updateProduct = async (req, res, next) => {
 
 const deleteProduct = async (req, res, next) => {
   try {
-    const response = await Products.findByIdAndDelete(req.params.productId);
+    if (res.user.admin) {
+      const response = await Products.findByIdAndDelete(req.params.productId);
 
-    if (!response) {
-      res.status(400).json("Cannot delete product!");
-      return null;
+      if (!response) {
+        res.status(400).json("Cannot delete product!");
+        return null;
+      }
+
+      res.status(200).json("Delete product success!");
+    } else {
+      return res.status(401).json("Don't have permisson to do this!");
     }
-
-    res.status(200).json("Delete product success!");
   } catch (error) {
     next(error);
   }
@@ -156,18 +168,22 @@ const getAuthenitcatedUser = async (req, res, next) => {
 
 const updateUser = async (req, res, next) => {
   try {
-    const result = await Users.findByIdAndUpdate(
-      req.params.userId,
-      { $set: req.body },
-      { new: true }
-    );
+    if (req.user.admin) {
+      const result = await Users.findByIdAndUpdate(
+        req.params.userId,
+        { $set: req.body },
+        { new: true }
+      );
 
-    if (!result) {
-      res.status(400).json("Cannot update user!");
-      return null;
+      if (!result) {
+        res.status(400).json("Cannot update user!");
+        return null;
+      }
+
+      res.status(200).json(result);
+    } else {
+      return res.status(401).json("Don't have permisson to do this!");
     }
-
-    res.status(200).json(result);
   } catch (error) {
     next(error);
   }
@@ -175,14 +191,18 @@ const updateUser = async (req, res, next) => {
 
 const deleteUser = async (req, res, next) => {
   try {
-    const response = await Users.findByIdAndDelete(req.params.userId);
+    if (req.user.admin) {
+      const response = await Users.findByIdAndDelete(req.params.userId);
 
-    if (!response) {
-      res.status(400).json("Cannot delete user");
-      return null;
+      if (!response) {
+        res.status(400).json("Cannot delete user");
+        return null;
+      }
+
+      res.status(200).json("Delete user success!");
+    } else {
+      return res.status(401).json("Don't have permisson to do this!");
     }
-
-    res.status(200).json("Delete user success!");
   } catch (error) {
     next(error);
   }
