@@ -11,6 +11,7 @@ import Cart from "../pages/user/shopping-cart/cart";
 import PaymentResult from "../pages/user/payment/paymentCallback";
 import toast from "react-hot-toast";
 import About from "../pages/user/about-us/about";
+import Sale from "../pages/user/sale/sale";
 
 const AuthMiddleWare = ({ children }) => {
   const token = sessionStorage.getItem("token");
@@ -42,6 +43,7 @@ function UserRouter() {
         <Route path="/about-us" element={<About />} />
         <Route path="/carts" element={<Cart />} />
         <Route path="/orders/vnpay-return" element={<PaymentResult />} />
+        <Route path="/sale" element={<Sale />} />
       </Routes>
       <MoonSportFooter />
     </>
