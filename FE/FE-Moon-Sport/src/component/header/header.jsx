@@ -149,8 +149,10 @@ function HeaderComp() {
         <Dropdown overlay={categoryMenu} trigger={["click"]}>
           <Menu.Item key="category">Category</Menu.Item>
         </Dropdown>
-        <Menu.Item key="sale">Sale</Menu.Item>
-        <Menu.Item key="about" onClick={() => navigation("about-us")}>
+        <Menu.Item key="sale" onClick={() => navigation("/sale")}>
+          Sale
+        </Menu.Item>
+        <Menu.Item key="about" onClick={() => navigation("/about-us")}>
           About Us
         </Menu.Item>
         <Menu.Item key="contact">Contact</Menu.Item>
