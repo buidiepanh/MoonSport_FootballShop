@@ -11,6 +11,7 @@ var productRouter = require("./routes/productRouter");
 var authenRouter = require("./routes/authenRouter");
 var cartRouter = require("./routes/cartRouter");
 var orderRouter = require("./routes/orderRouter");
+const cusOrderRouter = require("./routes/customerOrderRouter");
 
 var app = express();
 app.use(cors());
@@ -31,6 +32,7 @@ app.use("/products", productRouter);
 app.use("/authen", authenRouter);
 app.use("/carts", cartRouter);
 app.use("/orders", orderRouter);
+app.use("/customer-order", cusOrderRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

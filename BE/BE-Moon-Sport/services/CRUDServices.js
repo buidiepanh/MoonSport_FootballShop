@@ -2,6 +2,7 @@ const Categories = require("../models/category");
 const Products = require("../models/product");
 const Users = require("../models/user");
 const Carts = require("../models/cart");
+const Orders = require("../models/order");
 
 //====================Category CRUD==================
 const getAllCategory = async (req, res, next) => {
@@ -117,7 +118,7 @@ const updateProduct = async (req, res, next) => {
 
 const deleteProduct = async (req, res, next) => {
   try {
-    if (res.user.admin) {
+    if (req.user.admin) {
       const response = await Products.findByIdAndDelete(req.params.productId);
 
       if (!response) {
@@ -309,6 +310,39 @@ const deleteAllCartItem = async (req, res, next) => {
   }
 };
 
+//=================Order CRUD ==========================
+const viewAllOrder = async (req, res, next) => {
+  try {
+    const result = await Orders.find({})
+      .populate("products", "_id name price")
+      .populate("customer", "_id username");
+
+    if (!result) {
+      res.status(404).json("No order found!");
+      return null;
+    }
+
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const addNewOrder = async (req, res, next) => {
+  try {
+    const result = await Orders.create(req.body);
+
+    if (!result) {
+      res.status(400).json("Cannot add order!");
+      return null;
+    }
+
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAllCategory,
   postNewCategory,
@@ -329,4 +363,7 @@ module.exports = {
   updateCartItem,
   deleteCartItem,
   deleteAllCartItem,
+
+  viewAllOrder,
+  addNewOrder,
 };
