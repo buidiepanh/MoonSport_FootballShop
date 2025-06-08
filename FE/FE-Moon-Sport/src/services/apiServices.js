@@ -174,3 +174,12 @@ export const deleteProduct = async (productId) => {
     console.log(error);
   }
 };
+
+export const getAllOrders = async () => {
+  try {
+    const result = await axios.get("/customer-order");
+    return result.data;
+  } catch (error) {
+    console.log(error);
+  }
+};
