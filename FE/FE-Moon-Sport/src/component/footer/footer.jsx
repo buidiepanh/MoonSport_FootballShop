@@ -24,7 +24,7 @@ function MoonSportFooter() {
       <Row gutter={[32, 32]}>
         {/* Logo + Slogan */}
         <Col xs={24} md={8}>
-          <Title level={3} style={{ color: "#111" }}>
+          <Title level={3} style={{ color: "#111", cursor: "pointer" }}>
             🌓 Moon Sport
           </Title>
           <Text style={{ color: "#555" }}>

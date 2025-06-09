@@ -4,7 +4,7 @@ const jwt = require("jsonwebtoken");
 const authenticate = (req, res, next) => {
   const allowList = ["/login", "/register", "/products"];
 
-  if (allowList.find((item) => item === req.originalUrl)) {
+  if (allowList.find((item) => item === req.originalUrl.startsWith(item))) {
     next();
   } else {
     if (req?.headers?.authorization?.split(" ")?.[1]) {

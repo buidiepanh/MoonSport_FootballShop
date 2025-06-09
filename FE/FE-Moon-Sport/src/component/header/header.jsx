@@ -155,7 +155,9 @@ function HeaderComp() {
         <Menu.Item key="about" onClick={() => navigation("/about-us")}>
           About Us
         </Menu.Item>
-        <Menu.Item key="contact">Contact</Menu.Item>
+        <Menu.Item key="order" onClick={() => navigation("/order")}>
+          Your Order
+        </Menu.Item>
       </Menu>
 
       <Space size="large">
