@@ -183,3 +183,12 @@ export const getAllOrders = async () => {
     console.log(error);
   }
 };
+
+export const updateOrderStatus = async (orderId) => {
+  try {
+    const result = await axios.put(`/customer-order/${orderId}`);
+    return result.data;
+  } catch (error) {
+    console.log(error);
+  }
+};

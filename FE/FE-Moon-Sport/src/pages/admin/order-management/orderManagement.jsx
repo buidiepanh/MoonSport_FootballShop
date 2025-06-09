@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Table, Button, Space, message } from "antd";
-import { getAllOrders } from "../../../services/apiServices";
+import { getAllOrders, updateOrderStatus } from "../../../services/apiServices";
 import Item from "antd/es/list/Item";
+import dayjs from "dayjs";
+import toast from "react-hot-toast";
 
 function OrderManagement() {
   const [orders, setOrders] = useState([]);
@@ -11,13 +13,13 @@ function OrderManagement() {
     quantity: order.quantity,
     price: order.products[0]?.price || 0,
     customer: order.customer?.username || "Unknown",
+    status: order.status,
+    createdAt: order.createdAt,
   }));
 
   useEffect(() => {
     fetchAllOrders();
   }, []);
-
-  console.log(orders);
 
   const fetchAllOrders = async () => {
     try {
@@ -28,9 +30,18 @@ function OrderManagement() {
     }
   };
 
-  const handleApprove = (record) => {
-    message.success(`Order ${record.id} approved!`);
-    // You can call your backend API here
+  const handleApprove = async (record) => {
+    try {
+      const result = await updateOrderStatus(record._id);
+      if (result) {
+        toast.success("Update Order status success!");
+        fetchAllOrders();
+      } else {
+        toast.error("Update Order status failed!");
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const columns = [
@@ -53,6 +64,7 @@ function OrderManagement() {
       title: "Price",
       dataIndex: "price",
       key: "price",
+      render: (price) => `${price.toLocaleString()} VND`,
     },
     {
       title: "Customer",
@@ -60,15 +72,40 @@ function OrderManagement() {
       key: "customer",
     },
     {
+      title: "Date",
+      key: "createdAt",
+      render: (_, record) => dayjs(record.createdAt).format("DD/MM/YYYY"),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (text) => (
+        <span
+          style={{
+            color:
+              text === "APPROVED"
+                ? "green"
+                : text === "CANCELLED"
+                ? "red"
+                : "orange",
+          }}
+        >
+          {text}
+        </span>
+      ),
+    },
+    {
       title: "Action",
       key: "action",
-      render: (_, record) => (
-        <Space>
-          <Button type="primary" onClick={() => handleApprove(record)}>
-            Approve
-          </Button>
-        </Space>
-      ),
+      render: (_, record) =>
+        record.status === "PENDING" ? (
+          <Space>
+            <Button type="primary" onClick={() => handleApprove(record)}>
+              Approve
+            </Button>
+          </Space>
+        ) : null,
     },
   ];
 
