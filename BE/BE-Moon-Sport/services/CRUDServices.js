@@ -343,6 +343,32 @@ const addNewOrder = async (req, res, next) => {
   }
 };
 
+const updateOrderStatus = async (req, res, next) => {
+  try {
+    let newStatus = "";
+    if (req.user.admin) {
+      newStatus = "APPROVED";
+    } else {
+      newStatus = "CANCELLED";
+    }
+
+    const result = await Orders.findByIdAndUpdate(
+      req.params.orderId,
+      { $set: { status: newStatus } },
+      { $new: true }
+    );
+
+    if (!result) {
+      res.status(400).json("Cannot update order status!");
+      return null;
+    }
+
+    res.status(200).json(result);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAllCategory,
   postNewCategory,
@@ -366,4 +392,5 @@ module.exports = {
 
   viewAllOrder,
   addNewOrder,
+  updateOrderStatus,
 };
